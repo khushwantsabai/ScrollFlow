@@ -1,0 +1,99 @@
+{% comment %}
+  ScrollFlow Announcement Bar - Theme App Extension Block
+{% endcomment %}
+
+{{ 'scroll-flow.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'scroll-flow.js' | asset_url }}" defer="defer"></script>
+
+<div
+  class="scrollflow-banner-container"
+  data-shop="{{ shop.permanent_domain }}"
+  data-banner-id="{{ block.settings.banner_id }}"
+  style="
+    display: flex;
+    background: {{ block.settings.background_color | default: '#0D1117' }};
+    color: {{ block.settings.text_color | default: '#19D8CF' }};
+    padding-top: {{ block.settings.padding_top | default: 10 }}px;
+    padding-bottom: {{ block.settings.padding_bottom | default: 10 }}px;
+  "
+>
+  <div
+    class="scrollflow-banner-track {% if block.settings.direction == 'Left to Right' %}reverse{% endif %} pause-on-hover pause-on-focus"
+    style="animation-duration: {{ block.settings.speed_seconds | default: 15 }}s;"
+  >
+    {% for i in (1..4) %}
+      <span class="scrollflow-item">
+        <span>⚡ ANNOUNCEMENT BANNER</span>
+        <span class="scrollflow-divider">•</span>
+        <span>🎁 SPECIAL OFFER</span>
+        <span class="scrollflow-divider">•</span>
+      </span>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "ScrollFlow Bar",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "banner_id",
+      "label": "Banner ID (Leave empty for default active banner)"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#19D8CF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#111827"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        { "value": "Right to Left", "label": "Right to Left" },
+        { "value": "Left to Right", "label": "Left to Right" }
+      ],
+      "default": "Right to Left"
+    },
+    {
+      "type": "range",
+      "id": "speed_seconds",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 4,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 4,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 10
+    }
+  ]
+}
+{% endschema %}

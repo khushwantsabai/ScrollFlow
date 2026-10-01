@@ -1,0 +1,92 @@
+/* extensions/scroll-flow-banner/assets/scroll-flow.css */
+
+.scrollflow-banner-container {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.scrollflow-banner-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  animation: scrollflow-scroll-left 15s linear infinite;
+}
+
+.scrollflow-banner-track.reverse {
+  animation: scrollflow-scroll-right 15s linear infinite;
+}
+
+.scrollflow-banner-container:hover .scrollflow-banner-track.pause-on-hover,
+.scrollflow-banner-container:focus-within .scrollflow-banner-track.pause-on-focus {
+  animation-play-state: paused !important;
+}
+
+.scrollflow-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.scrollflow-divider {
+  margin: 0 8px;
+  opacity: 0.8;
+}
+
+.scrollflow-cta-btn {
+  margin-left: 12px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  transition: opacity 0.2s ease;
+}
+
+.scrollflow-cta-btn:hover {
+  opacity: 0.9;
+}
+
+@keyframes scrollflow-scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes scrollflow-scroll-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .scrollflow-banner-track {
+    animation: none !important;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .scrollflow-item {
+    font-size: 12px !important;
+    padding: 0 14px !important;
+  }
+  .scrollflow-cta-btn {
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+  }
+}

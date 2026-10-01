@@ -1,0 +1,9 @@
+api_version = "2026-10"
+type = "theme"
+name = "scroll-flow-banner"
+uid = "b1e54497-eb6a-9727-f32b-cb96d4b743df11c5b1c4"
+
+[[blocks]]
+name = "ScrollFlow Announcement Bar"
+target = "section"
+template = "announcement-bar"
