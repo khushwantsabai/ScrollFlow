@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "b7dd1ee6ec82a20061a5ae4451a052b5"
-application_url = "https://example.com"
+application_url = "https://scroll-flow-pied.vercel.app"
 embedded = true
 name = "ScrollFlow"
 
@@ -45,7 +45,12 @@ api_version = "2026-10"
   topics = [ "app/scopes_update" ]
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ 
+  "https://scroll-flow-pied.vercel.app/api/auth",
+  "https://scroll-flow-pied.vercel.app/auth/callback",
+  "https://scroll-flow-pied.vercel.app/auth/shopify/callback",
+  "https://scroll-flow-pied.vercel.app/api/auth/callback"
+]
 
 [app_proxy]
 url = "/api/storefront/banner"
