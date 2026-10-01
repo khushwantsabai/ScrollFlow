@@ -1,6 +1,7 @@
 // app/routes/app.jsx
-import { Outlet, useLoaderData, Link } from "react-router";
+import { Outlet, useLoaderData, Link, useRouteError } from "react-router";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
+import { boundary } from "@shopify/shopify-app-react-router/server";
 import { NavMenu } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopData, seedTemplatesIfEmpty } from "../utils/db.helpers.server";
@@ -44,4 +45,13 @@ export default function App() {
     </AppProvider>
   );
 }
+
+// Shopify needs to catch "bounce to embedded" 200 responses that are thrown by authenticate.admin
+export function ErrorBoundary() {
+  return boundary.error(useRouteError());
+}
+
+export const headers = (headersArgs) => {
+  return boundary.headers(headersArgs);
+};
 
