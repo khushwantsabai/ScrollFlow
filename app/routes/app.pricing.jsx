@@ -1,5 +1,5 @@
-// app/routes/app.pricing.jsx
 import { useLoaderData, useFetcher } from "react-router";
+import { useEffect } from "react";
 import { authenticate } from "../shopify.server";
 import { getShopData } from "../utils/db.helpers.server";
 import { requestSubscription } from "../utils/billing.server";
@@ -29,6 +29,14 @@ export const action = async ({ request }) => {
 export default function PricingPage() {
   const { currentPlan } = useLoaderData();
   const fetcher = useFetcher();
+
+  useEffect(() => {
+    if (fetcher.data?.redirectUrl) {
+      window.top.location.href = fetcher.data.redirectUrl;
+    } else if (fetcher.data?.success && fetcher.data?.plan) {
+      shopify.toast.show(`Successfully updated plan to ${fetcher.data.plan}!`);
+    }
+  }, [fetcher.data]);
 
   const handleSelectPlan = (planName) => {
     fetcher.submit({ plan: planName }, { method: "POST" });
