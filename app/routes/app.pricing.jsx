@@ -1,6 +1,5 @@
 // app/routes/app.pricing.jsx
 import { useLoaderData, useFetcher } from "react-router";
-import { useState } from "react";
 import { authenticate } from "../shopify.server";
 import { getShopData } from "../utils/db.helpers.server";
 import { requestSubscription } from "../utils/billing.server";
@@ -30,7 +29,6 @@ export const action = async ({ request }) => {
 export default function PricingPage() {
   const { currentPlan } = useLoaderData();
   const fetcher = useFetcher();
-  const [billingCycle, setBillingCycle] = useState("monthly"); // monthly, yearly
 
   const handleSelectPlan = (planName) => {
     fetcher.submit({ plan: planName }, { method: "POST" });
@@ -49,40 +47,6 @@ export default function PricingPage() {
           <p style={{ fontSize: "14px", color: "#64748B", margin: 0 }}>
             Choose the perfect plan for your store.
           </p>
-        </div>
-
-        {/* Monthly / Yearly Toggle */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "9999px" }}>
-          <button
-            onClick={() => setBillingCycle("monthly")}
-            style={{
-              border: "none",
-              padding: "6px 14px",
-              borderRadius: "9999px",
-              fontSize: "12px",
-              fontWeight: "600",
-              cursor: "pointer",
-              backgroundColor: billingCycle === "monthly" ? "#2563EB" : "transparent",
-              color: billingCycle === "monthly" ? "#FFFFFF" : "#64748B",
-            }}
-          >
-            Monthly
-          </button>
-          <button
-            onClick={() => setBillingCycle("yearly")}
-            style={{
-              border: "none",
-              padding: "6px 14px",
-              borderRadius: "9999px",
-              fontSize: "12px",
-              fontWeight: "600",
-              cursor: "pointer",
-              backgroundColor: billingCycle === "yearly" ? "#2563EB" : "transparent",
-              color: billingCycle === "yearly" ? "#FFFFFF" : "#64748B",
-            }}
-          >
-            Yearly <span style={{ color: "#10B981", marginLeft: "4px" }}>Save 20%</span>
-          </button>
         </div>
       </div>
 
