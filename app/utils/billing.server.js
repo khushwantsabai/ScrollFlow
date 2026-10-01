@@ -64,7 +64,7 @@ export async function requestSubscription(request, planName) {
   }
 
   const targetPlan = BILLING_PLANS[planName] || BILLING_PLANS.BASIC;
-  const returnUrl = `${process.env.SHOPIFY_APP_URL || ""}/app/pricing?shop=${shopDomain}&updated=true`;
+  const returnUrl = `${process.env.SHOPIFY_APP_URL || ""}/app/templates`;
 
   const response = await admin.graphql(
     `#graphql
