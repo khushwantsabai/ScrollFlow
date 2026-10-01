@@ -58,5 +58,4 @@ subpath = "scrollflow"
 prefix = "apps"
 
 [build]
-include_config_on_deploy = true
 automatically_update_urls_on_dev = true
