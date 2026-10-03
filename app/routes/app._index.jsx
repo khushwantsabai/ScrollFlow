@@ -3,20 +3,22 @@ import { useLoaderData, useFetcher, Link } from "react-router";
 import { useState } from "react";
 import { authenticate } from "../shopify.server";
 import { getBanners, getShopData } from "../utils/db.helpers.server";
+import { canAccessTemplate, getMaxAllowedBanners } from "../utils/permissions";
 import prisma from "../db.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const shopData = await getShopData(session.shop);
 
-  // Enforce single published banner rule: if multiple PUBLISHED/ACTIVE banners exist, keep only the most recent one
+  // Enforce published banner limits based on plan
+  const allowedBanners = getMaxAllowedBanners(shopData.plan);
   const publishedBanners = await prisma.banner.findMany({
     where: { shopDomain: session.shop, status: { in: ["PUBLISHED", "ACTIVE"] } },
     orderBy: { updatedAt: "desc" },
   });
 
-  if (publishedBanners.length > 1) {
-    const [latest, ...olderBanners] = publishedBanners;
+  if (publishedBanners.length > allowedBanners) {
+    const olderBanners = publishedBanners.slice(allowedBanners);
     const olderIds = olderBanners.map((b) => b.id);
     await prisma.banner.updateMany({
       where: { id: { in: olderIds } },
@@ -59,11 +61,27 @@ export const action = async ({ request }) => {
         : "PUBLISHED";
 
       if (newStatus === "PUBLISHED" || newStatus === "ACTIVE") {
-        // Unpublish all other banners for this shop domain so ONLY ONE is published at a time
-        await prisma.banner.updateMany({
-          where: { shopDomain: session.shop, NOT: { id: bannerId } },
-          data: { status: "UNPUBLISHED" },
+        // Enforce banner limits based on plan
+        const shopData = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+        const allowedBanners = getMaxAllowedBanners(shopData?.plan || "BASIC");
+        
+        const publishedCount = await prisma.banner.count({
+          where: { shopDomain: session.shop, status: { in: ["PUBLISHED", "ACTIVE"] }, NOT: { id: bannerId } }
         });
+
+        if (publishedCount >= allowedBanners) {
+          // Unpublish the oldest to make room
+          const oldestPublished = await prisma.banner.findFirst({
+            where: { shopDomain: session.shop, status: { in: ["PUBLISHED", "ACTIVE"] }, NOT: { id: bannerId } },
+            orderBy: { updatedAt: "asc" },
+          });
+          if (oldestPublished) {
+            await prisma.banner.update({
+              where: { id: oldestPublished.id },
+              data: { status: "UNPUBLISHED" },
+            });
+          }
+        }
       }
 
       await prisma.banner.update({
@@ -128,8 +146,10 @@ export default function Dashboard() {
       const isCurrentlyPublished = banner.status === "PUBLISHED" || banner.status === "ACTIVE";
       status = targetStatus || (isCurrentlyPublished ? "UNPUBLISHED" : "PUBLISHED");
     } else if (activeSubmissionId && banner.id !== activeSubmissionId) {
-      // If another banner was published, automatically unpublish this banner
-      status = "UNPUBLISHED";
+      // If we only allow 1 banner, automatically unpublish this banner on UI
+      if (getMaxAllowedBanners(plan) === 1) {
+        status = "UNPUBLISHED";
+      }
     }
 
     return { ...banner, status };
@@ -263,6 +283,8 @@ export default function Dashboard() {
               const doubledMessages = [...messages, ...messages, ...messages, ...messages];
               const isPublished = banner.status === "PUBLISHED" || banner.status === "ACTIVE";
 
+              const isUnlocked = canAccessTemplate(plan, banner.templateId);
+
               return (
                 <div
                   key={banner.id}
@@ -277,7 +299,7 @@ export default function Dashboard() {
                   }}
                 >
                   {/* Left: Row Banner Preview */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: "1 1 auto", minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: "1 1 auto", minWidth: 0, opacity: isUnlocked ? 1 : 0.6 }}>
                     <div
                       style={{
                         width: "220px",
@@ -306,7 +328,7 @@ export default function Dashboard() {
 
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: "14px", fontWeight: "600", color: "#111827", marginBottom: "2px" }}>
-                        {banner.name}
+                        {banner.name} {!isUnlocked && <span style={{ fontSize: "12px", color: "#EC4899" }}>🔒 Locked</span>}
                       </div>
                       <div style={{ fontSize: "12px", color: "#64748B" }}>
                         {banner.templateId} • {parsedSettings.direction}
@@ -329,7 +351,15 @@ export default function Dashboard() {
                     </span>
 
                     {/* Publish / Unpublish Action Button */}
-                    {isPublished ? (
+                    {!isUnlocked ? (
+                      <Link
+                        to="/app/pricing"
+                        className="sf-btn-primary"
+                        style={{ padding: "6px 14px", fontSize: "12px", backgroundColor: "#F3E8FF", color: "#7E22CE" }}
+                      >
+                        🔒 Upgrade
+                      </Link>
+                    ) : isPublished ? (
                       <button
                         type="button"
                         onClick={() => handleToggle(banner.id, banner.status)}
@@ -354,20 +384,34 @@ export default function Dashboard() {
                       <input
                         type="checkbox"
                         checked={isPublished}
-                        onChange={() => handleToggle(banner.id, banner.status)}
+                        disabled={!isUnlocked}
+                        onChange={() => {
+                          if (isUnlocked) handleToggle(banner.id, banner.status);
+                        }}
                       />
-                      <span className="sf-slider"></span>
+                      <span className="sf-slider" style={{ opacity: !isUnlocked ? 0.5 : 1 }}></span>
                     </label>
 
                     {/* Edit */}
-                    <Link
-                      to={`/app/banners/${banner.id}`}
-                      className="sf-btn-ghost"
-                      title="Edit banner"
-                      style={{ padding: "6px 10px" }}
-                    >
-                      ✏️ Edit
-                    </Link>
+                    {!isUnlocked ? (
+                      <Link
+                        to="/app/pricing"
+                        className="sf-btn-ghost"
+                        title="Unlock to edit"
+                        style={{ padding: "6px 10px", color: "#94A3B8" }}
+                      >
+                        🔒 Edit
+                      </Link>
+                    ) : (
+                      <Link
+                        to={`/app/banners/${banner.id}`}
+                        className="sf-btn-ghost"
+                        title="Edit banner"
+                        style={{ padding: "6px 10px" }}
+                      >
+                        ✏️ Edit
+                      </Link>
+                    )}
 
                     {/* Duplicate */}
                     <button
