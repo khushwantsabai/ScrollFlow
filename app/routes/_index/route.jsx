@@ -1,10 +1,7 @@
-import { redirect, Form, useLoaderData } from "react-router";
+import { redirect, Form, useLoaderData, useNavigation } from "react-router";
 import { useState } from "react";
 import { login } from "../../shopify.server";
-
-export const links = () => [
-  { rel: "stylesheet", href: "/login.css" },
-];
+import styles from "./styles.module.css";
 
 export const loader = async ({ request }) => {
   const url = new URL(request.url);
@@ -16,203 +13,189 @@ export const loader = async ({ request }) => {
   return { showForm: Boolean(login) };
 };
 
-export default function Index() {
+// Inline SVG for the 'S with arrows' Logo
+const ScrollFlowLogo = () => (
+  <svg className={styles.logoSvg} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#16C7FF" />
+        <stop offset="50%" stopColor="#287BFF" />
+        <stop offset="100%" stopColor="#7C3AED" />
+      </linearGradient>
+      <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+    </defs>
+    
+    <g filter="url(#logoGlow)">
+      {/* Top arrow curving right */}
+      <path d="M30 45 C30 25, 45 20, 65 20 L65 10 L85 25 L65 40 L65 30 C50 30, 42 35, 42 45 Z" fill="url(#logoGrad)" />
+      {/* Bottom arrow curving left */}
+      <path d="M70 55 C70 75, 55 80, 35 80 L35 90 L15 75 L35 60 L35 70 C50 70, 58 65, 58 55 Z" fill="url(#logoGrad)" />
+    </g>
+  </svg>
+);
+
+export default function App() {
   const { showForm } = useLoaderData();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const navigation = useNavigation();
+  const [domainError, setDomainError] = useState(false);
   
-  // 'default', 'loading', 'error', 'success', 'shopify'
-  const [loginState, setLoginState] = useState("default");
-  
-  // Real Shopify shop input
-  const [shop, setShop] = useState("");
+  const isSubmitting = navigation.state === "submitting";
 
-  // Handle fake email/password login
-  const handleEmailLogin = (e) => {
-    e.preventDefault();
-    if (!email || !password) return;
-    
-    setLoginState("loading");
-    
-    // Simulate network delay and error
-    setTimeout(() => {
-      setLoginState("error");
-    }, 1500);
+  const handleSubmit = (e) => {
+    const formData = new FormData(e.currentTarget);
+    const shop = formData.get("shop");
+    if (!shop || !shop.includes(".myshopify.com")) {
+      e.preventDefault();
+      setDomainError(true);
+      setTimeout(() => setDomainError(false), 2000);
+    }
   };
 
   return (
-    <div className="login-container">
+    <div className={styles.pageWrapper}>
       {/* Background Effects */}
-      <div className="bg-glow-1"></div>
-      <div className="bg-glow-2"></div>
-      <div className="noise-overlay"></div>
-      <div className="particles">
-        {[...Array(20)].map((_, i) => (
-          <div 
-            key={i} 
-            className="particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 6 + 2}px`,
-              height: `${Math.random() * 6 + 2}px`,
-              animationDelay: `${Math.random() * 15}s`,
-              animationDuration: `${Math.random() * 10 + 10}s`
-            }}
-          ></div>
-        ))}
-      </div>
+      <div className={styles.bgGlowCyan} />
+      <div className={styles.bgGlowPurple} />
+      <div className={styles.bgGrid} />
 
-      {/* Login Card */}
-      <div className={`login-card ${loginState === 'error' ? 'shake' : ''}`}>
+      <div className={styles.content}>
         
-        {/* Logo Section */}
-        <div className="logo-container">
-          <div className="logo-glow">
-            {/* Custom SVG Logo matching prompt image */}
-            <svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#06B6D4" />
-                  <stop offset="100%" stopColor="#3B82F6" />
-                </linearGradient>
-                <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#3B82F6" />
-                  <stop offset="100%" stopColor="#8B5CF6" />
-                </linearGradient>
-              </defs>
-              <path d="M20,60 C20,30 40,20 60,20 L60,10 L85,25 L60,40 L60,30 C45,30 35,40 35,60" fill="url(#grad1)"/>
-              <path d="M80,40 C80,70 60,80 40,80 L40,90 L15,75 L40,60 L40,70 C55,70 65,60 65,40" fill="url(#grad2)"/>
-            </svg>
+        {/* Header / Logo */}
+        <header className={styles.header}>
+          <div className={styles.logoContainer}>
+            <ScrollFlowLogo />
+            <h1 className={styles.brandName}>
+              Scroll <span className={styles.textGradient}>Flow</span>
+            </h1>
           </div>
-          <h1 className="welcome-title">Welcome back</h1>
-          <p className="welcome-subtitle">Sign in to manage your scrolling templates and store content.</p>
+          <p className={styles.headerTagline}>
+            Create beautiful scrolling experiences for your Shopify store.
+          </p>
+        </header>
+
+        {/* Hero Section */}
+        <section className={styles.hero}>
+          <div className={styles.badge}>
+            ✦ Shopify Store Enhancement
+          </div>
+          <h2 className={styles.heroHeading}>
+            Make Your Store <span className={styles.textGradient}>Flow.</span>
+          </h2>
+          <p className={styles.heroSubtitle}>
+            Create engaging scrolling banners and animated content for your Shopify store — without complicated setup.
+          </p>
+        </section>
+
+        {/* Login Card */}
+        {showForm && (
+          <div className={styles.loginCard}>
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>Connect Your Store</h3>
+              <p className={styles.cardSubtitle}>Enter your Shopify store domain to continue.</p>
+            </div>
+
+            <Form className={styles.form} method="post" action="/auth/login" onSubmit={handleSubmit}>
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Shop domain</label>
+                <div className={styles.inputWrapper}>
+                  {/* Shopify Icon SVG */}
+                  <svg className={styles.inputIcon} viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.8 6.4L16 2.1c-.2-.3-.6-.4-.9-.2l-3.1 2-3.1-2c-.3-.2-.7-.1-.9.2L5.2 6.4C4.5 6.7 4 7.4 4 8.2v10.6c0 1.2 1 2.2 2.2 2.2h11.6c1.2 0 2.2-1 2.2-2.2V8.2c0-.8-.5-1.5-1.2-1.8zM12 4.4l1.6 1.1c.3.2.7.1.9-.2l1.2-1.8L17.5 6H6.5l1.8-2.5 1.2 1.8c.2.3.6.4.9.2L12 4.4zM18 18.8c0 .1-.1.2-.2.2H6.2c-.1 0-.2-.1-.2-.2V8h12v10.8z"/>
+                    <path d="M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 2.5c-.3 0-.5-.2-.5-.5s.2-.5.5-.5.5.2.5.5-.2.5-.5.5z"/>
+                  </svg>
+                  <input
+                    className={`${styles.input} ${domainError ? styles.inputError : ''}`}
+                    type="text"
+                    name="shop"
+                    placeholder="your-store.myshopify.com"
+                  />
+                </div>
+                {domainError ? (
+                  <span className={styles.errorMessage}>Please enter a valid Shopify store domain.</span>
+                ) : (
+                  <span className={styles.inputHint}>Example: my-shop-domain.myshopify.com</span>
+                )}
+              </div>
+
+              <button className={styles.submitBtn} type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <div className={styles.spinner} />
+                    <span>Connecting...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Continue to Shopify</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </>
+                )}
+              </button>
+              
+              <div className={styles.trustMessage}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Your store connection is securely handled through Shopify.
+              </div>
+            </Form>
+          </div>
+        )}
+
+        {/* Animated Marquee Preview */}
+        <div className={styles.marqueeContainer}>
+          <div className={styles.marqueeTrack}>
+            <span className={styles.marqueeItem}>NEW ARRIVALS ✦</span>
+            <span className={styles.marqueeItem}>LIMITED OFFER ✦</span>
+            <span className={styles.marqueeItem}>FREE SHIPPING ✦</span>
+            <span className={styles.marqueeItem}>SHOP NOW ✦</span>
+            <span className={styles.marqueeItem}>NEW ARRIVALS ✦</span>
+            <span className={styles.marqueeItem}>LIMITED OFFER ✦</span>
+            <span className={styles.marqueeItem}>FREE SHIPPING ✦</span>
+            <span className={styles.marqueeItem}>SHOP NOW ✦</span>
+          </div>
         </div>
 
-        {loginState === "shopify" && showForm ? (
-          /* Actual Shopify Auth Form */
-          <Form method="post" action="/auth/login" className="shopify-form" style={{ animation: "fadeInStagger 0.4s ease forwards" }}>
-            <div className="form-group" style={{ animationDelay: "0.1s" }}>
-              <div className="input-wrapper">
-                <div className="input-icon">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                </div>
-                <input 
-                  type="text" 
-                  name="shop"
-                  className="sf-input" 
-                  placeholder="example.myshopify.com" 
-                  value={shop}
-                  onChange={(e) => setShop(e.currentTarget.value)}
-                  autoComplete="on"
-                  autoFocus
-                  required
-                />
-              </div>
-            </div>
-            
-            <button type="submit" className="btn-primary" style={{ animationDelay: "0.2s" }}>
-              Log in to Shopify
-            </button>
+        {/* Features */}
+        <section className={styles.features}>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>⚡</div>
+            <h4 className={styles.featureTitle}>Smooth Scrolling</h4>
+            <p className={styles.featureDesc}>
+              Create fast, smooth scrolling content that looks great on every device.
+            </p>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>🎨</div>
+            <h4 className={styles.featureTitle}>Beautiful Templates</h4>
+            <p className={styles.featureDesc}>
+              Choose from professionally designed scrolling templates for your store.
+            </p>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>📱</div>
+            <h4 className={styles.featureTitle}>Mobile Responsive</h4>
+            <p className={styles.featureDesc}>
+              Deliver a consistent experience across desktop, tablet and mobile.
+            </p>
+          </div>
+        </section>
 
-            <div className="divider" style={{ animationDelay: "0.3s" }}>
-              <span>OR</span>
-            </div>
-
-            <button 
-              type="button" 
-              className="btn-secondary" 
-              style={{ animationDelay: "0.4s" }}
-              onClick={() => setLoginState("default")}
-            >
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-              Back to Email Login
-            </button>
-          </Form>
-        ) : (
-          /* Fake Email/Password Form for UI Spec */
-          <form onSubmit={handleEmailLogin}>
-            <div className="form-group">
-              <div className="input-wrapper">
-                <div className="input-icon">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                </div>
-                <input 
-                  type="email" 
-                  className="sf-input" 
-                  placeholder="Enter your email" 
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); setLoginState("default"); }}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <div className="input-wrapper">
-                <div className="input-icon">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  className="sf-input" 
-                  placeholder="Enter your password" 
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setLoginState("default"); }}
-                  required
-                />
-                <button type="button" className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? (
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0l-3.29-3.29"></path></svg>
-                  ) : (
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.543 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="form-options">
-              <label className="checkbox-label">
-                <input type="checkbox" className="checkbox-input" />
-                Remember me
-              </label>
-              <a href="#" className="forgot-link">Forgot password?</a>
-            </div>
-
-            {loginState === "error" && (
-              <div className="error-message" style={{ marginBottom: "20px" }}>
-                Invalid email or password. Please try again.
-              </div>
-            )}
-
-            <button type="submit" className="btn-primary" disabled={loginState === "loading" || loginState === "success"}>
-              {loginState === "loading" ? (
-                <><div className="spinner"></div> Signing in...</>
-              ) : loginState === "success" ? (
-                <><div className="check-animation"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div> Success!</>
-              ) : (
-                "Sign In"
-              )}
-            </button>
-
-            <div className="divider">
-              <span>OR</span>
-            </div>
-
-            <button type="button" className="btn-secondary" onClick={() => setLoginState("shopify")}>
-              <svg width="20" height="20" viewBox="0 0 30 30" fill="currentColor">
-                <path d="M22.84 8.78c-.22-.72-1.35-3.08-1.58-3.52-.77-1.48-1.63-2.61-3.6-2.52h-.05c-1.28.06-4.52 1.34-6.61 2.33C9.09 5.96 7 7.02 6.57 7.29c-1.39.86-1.78 1.95-1.92 3.01-.19 1.4.15 6.44.29 7.7.13 1.13.78 2.05 1.5 2.56.76.54 3.03 2.11 3.52 2.45 2.15 1.49 4.34 2.87 4.54 2.99.6.35 1.36.43 2.01.2 1.16-.42 5.06-2.73 5.4-2.92 1.05-.6 1.76-1.61 1.88-2.68.22-1.89.57-7.22.62-8.31.02-.73-.59-2.31-1.57-3.51zm-7.66 16.7c-.55 0-3.32-2.12-3.8-2.45-1.07-.75-2.07-1.48-2.31-1.65-.67-.47-1.3-1.39-1.39-2.35-.11-.97-.24-5.22-.38-7 .01-.13 1.38-.85 1.38-.85.76-.43 2.3-1.12 3.14-1.36 1.09-.32 1.95.42 2.12.58.55.51.58 1.45.1 2.1-.22.3-.98 1.12-2.31 2.22l2.36 1.09 2.11 2.4-5.11-2.12c1.47-1.27 2.07-1.87 2.21-2.04.14-.17.2-.68.14-1.07l2.84 1.36 1.1 1.16-5.06-2.04c.05-.03.09-.07.13-.1 1.12-.95 1.14-1.95.95-2.41-.18-.46-.72-.75-1.18-.75-.24 0-.48.06-.69.17-.66.36-4.57 2.48-4.57 2.48l-.02-.8c.45-.29 3.55-2.07 4.79-2.7 1.55-.78 4.74-2.07 5.51-2.12.87-.06 1.42.49 1.95 1.5.17.32.96 2 1.09 2.51.68 2.65-.29 6.22-2.22 7.73-1.19.93-2.12 1.5-2.58 1.76z"></path>
-              </svg>
-              Continue with Shopify
-            </button>
-
-            <div className="signup-section">
-              Don't have an account?
-              <a href="#" className="signup-link">Create an account</a>
-            </div>
-          </form>
-        )}
+        {/* Footer */}
+        <footer className={styles.footer}>
+          <div>&copy; 2026 Scroll Flow</div>
+          <div className={styles.footerLinks}>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Support</a>
+          </div>
+        </footer>
 
       </div>
     </div>
