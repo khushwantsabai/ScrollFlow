@@ -318,7 +318,7 @@ export default function SettingsPage() {
 
       {/* Save Settings Button at bottom */}
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button onClick={handleSubmit} disabled={isSaving} className="sf-btn-primary" style={{ padding: "10px 24px" }}>
+        <button type="button" onClick={handleSubmit} disabled={isSaving} className="sf-btn-primary" style={{ padding: "10px 24px" }}>
           {isSaving ? "Saving..." : "Save Settings"}
         </button>
       </div>

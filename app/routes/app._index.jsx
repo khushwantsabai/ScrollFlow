@@ -331,6 +331,7 @@ export default function Dashboard() {
                     {/* Publish / Unpublish Action Button */}
                     {isPublished ? (
                       <button
+                        type="button"
                         onClick={() => handleToggle(banner.id, banner.status)}
                         className="sf-btn-ghost"
                         style={{ padding: "6px 12px", fontSize: "12px", color: "#64748B" }}
@@ -339,6 +340,7 @@ export default function Dashboard() {
                       </button>
                     ) : (
                       <button
+                        type="button"
                         onClick={() => handleToggle(banner.id, banner.status)}
                         className="sf-btn-primary"
                         style={{ padding: "6px 14px", fontSize: "12px", backgroundColor: "#5B2CFF" }}
@@ -369,6 +371,7 @@ export default function Dashboard() {
 
                     {/* Duplicate */}
                     <button
+                      type="button"
                       onClick={() => handleDuplicate(banner.id)}
                       className="sf-btn-ghost"
                       title="Duplicate banner"
@@ -379,6 +382,7 @@ export default function Dashboard() {
 
                     {/* Delete */}
                     <button
+                      type="button"
                       onClick={() => setDeleteTargetId(banner.id)}
                       className="sf-btn-ghost"
                       title="Delete banner"
@@ -415,10 +419,10 @@ export default function Dashboard() {
               This action cannot be undone and will remove the banner from your store.
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-              <button onClick={() => setDeleteTargetId(null)} className="sf-btn-ghost">
+              <button type="button" onClick={() => setDeleteTargetId(null)} className="sf-btn-ghost">
                 Cancel
               </button>
-              <button onClick={confirmDelete} className="sf-btn-primary" style={{ backgroundColor: "#EF4444" }}>
+              <button type="button" onClick={confirmDelete} className="sf-btn-primary" style={{ backgroundColor: "#EF4444" }}>
                 Delete
               </button>
             </div>

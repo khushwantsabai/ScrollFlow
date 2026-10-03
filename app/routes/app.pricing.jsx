@@ -96,6 +96,7 @@ export default function PricingPage() {
           </div>
 
           <button
+            type="button"
             onClick={() => handleSelectPlan("FREE")}
             disabled={currentPlan === "FREE" || isSubmitting}
             className="sf-btn-ghost"
@@ -162,6 +163,7 @@ export default function PricingPage() {
           </div>
 
           <button
+            type="button"
             onClick={() => handleSelectPlan("BASIC")}
             disabled={currentPlan === "BASIC" || isSubmitting}
             className="sf-btn-primary"
@@ -206,6 +208,7 @@ export default function PricingPage() {
           </div>
 
           <button
+            type="button"
             onClick={() => handleSelectPlan("PREMIUM")}
             disabled={currentPlan === "PREMIUM" || isSubmitting}
             className="sf-btn-primary"

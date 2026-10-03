@@ -115,6 +115,7 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
 
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <button
+            type="button"
             onClick={() => handleSave("DRAFT")}
             disabled={isSaving}
             className="sf-btn-ghost"
@@ -123,6 +124,7 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
             💾 Save Draft
           </button>
           <button
+            type="button"
             onClick={() => handleSave("PUBLISHED")}
             disabled={isSaving}
             className="sf-btn-primary"
@@ -189,6 +191,7 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
                       }}
                     />
                     <button
+                      type="button"
                       onClick={() => deleteMessage(index)}
                       style={{ border: "none", background: "none", cursor: "pointer", color: "#EF4444", fontSize: "14px" }}
                       title="Delete message"
@@ -200,6 +203,7 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
               </div>
 
               <button
+                type="button"
                 onClick={addMessage}
                 style={{
                   marginTop: "12px",
@@ -376,6 +380,7 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
               {/* Text Settings Accordion */}
               <div style={{ border: "1px solid #E5E7EB", borderRadius: "8px", overflow: "hidden" }}>
                 <button
+                  type="button"
                   onClick={() => setActiveAccordion(activeAccordion === "text" ? "" : "text")}
                   style={{
                     width: "100%",
@@ -459,6 +464,7 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
               {/* Colors Accordion */}
               <div style={{ border: "1px solid #E5E7EB", borderRadius: "8px", overflow: "hidden" }}>
                 <button
+                  type="button"
                   onClick={() => setActiveAccordion(activeAccordion === "colors" ? "" : "colors")}
                   style={{
                     width: "100%",
@@ -523,6 +529,7 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
               {/* Icon & Divider Accordion */}
               <div style={{ border: "1px solid #E5E7EB", borderRadius: "8px", overflow: "hidden" }}>
                 <button
+                  type="button"
                   onClick={() => setActiveAccordion(activeAccordion === "divider" ? "" : "divider")}
                   style={{
                     width: "100%",
@@ -568,6 +575,7 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
               {/* CTA Button Accordion */}
               <div style={{ border: "1px solid #E5E7EB", borderRadius: "8px", overflow: "hidden" }}>
                 <button
+                  type="button"
                   onClick={() => setActiveAccordion(activeAccordion === "cta" ? "" : "cta")}
                   style={{
                     width: "100%",

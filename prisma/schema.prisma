@@ -1,13 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -34,10 +31,10 @@ model Session {
 model Shop {
   id          String   @id @default(uuid())
   shopDomain  String   @unique
-  accessToken String?
-  plan        String   @default("BASIC") // FREE, BASIC, PREMIUM
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  accessToken String?
+  plan        String   @default("BASIC")
 }
 
 model Banner {
@@ -45,45 +42,45 @@ model Banner {
   shopDomain String
   name       String
   templateId String   @default("template-1")
-  status     String   @default("ACTIVE") // ACTIVE, PAUSED, DRAFT
-  settings   String   // Stored as JSON string
+  status     String   @default("ACTIVE")
+  settings   String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
 
 model Subscription {
   id                    String   @id @default(uuid())
-  shopDomain            String
-  plan                  String
-  shopifySubscriptionId String?
-  status                String   @default("ACTIVE") // PENDING, ACTIVE, CANCELLED, EXPIRED, DECLINED
+  status                String   @default("ACTIVE")
   createdAt             DateTime @default(now())
+  plan                  String
+  shopDomain            String
+  shopifySubscriptionId String?
   updatedAt             DateTime @updatedAt
 }
 
 model Template {
   id           String   @id
   name         String
-  plan         String   // FREE, BASIC, PREMIUM
-  description  String?
-  previewImage String?
-  settings     String   // JSON string
   createdAt    DateTime @default(now())
+  description  String?
+  plan         String
+  previewImage String?
+  settings     String
   updatedAt    DateTime @updatedAt
 }
 
 model StoreSettings {
-  id               String   @id @default(uuid())
-  shopDomain       String   @unique
-  defaultAnimation String   @default("Right to Left")
-  defaultSpeed     String   @default("Normal")
-  defaultHeight    Int      @default(40)
-  defaultBgColor   String   @default("#19D8CF")
-  defaultTextColor String   @default("#111827")
-  defaultHoverColor String  @default("#06B6D4")
-  reduceMotion     Boolean  @default(false)
-  pauseOnHover     Boolean  @default(true)
-  pauseOnFocus     Boolean  @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                String   @id @default(uuid())
+  shopDomain        String   @unique
+  defaultAnimation  String   @default("Right to Left")
+  defaultSpeed      String   @default("Normal")
+  defaultHeight     Int      @default(40)
+  defaultBgColor    String   @default("#19D8CF")
+  defaultTextColor  String   @default("#111827")
+  defaultHoverColor String   @default("#06B6D4")
+  reduceMotion      Boolean  @default(false)
+  pauseOnHover      Boolean  @default(true)
+  pauseOnFocus      Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }

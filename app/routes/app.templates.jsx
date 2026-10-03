@@ -58,6 +58,7 @@ export default function TemplatesPage() {
           const isSelected = activeFilter === f.key;
           return (
             <button
+              type="button"
               key={f.key}
               onClick={() => setActiveFilter(f.key)}
               style={{
@@ -213,6 +214,7 @@ export default function TemplatesPage() {
               {/* Action Button */}
               {isUnlocked ? (
                 <button
+                  type="button"
                   onClick={() => navigate(`/app/banners/new?templateId=${template.id}`)}
                   className="sf-btn-primary"
                   style={{ width: "100%", padding: "10px 14px", fontSize: "13px" }}
