@@ -191,9 +191,7 @@ export default function App() {
         <footer className={styles.footer}>
           <div>&copy; 2026 Scroll Flow</div>
           <div className={styles.footerLinks}>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Support</a>
+            <a href="/privacy">Privacy Policy</a>
           </div>
         </footer>
 

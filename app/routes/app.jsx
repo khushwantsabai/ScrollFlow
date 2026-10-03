@@ -36,6 +36,7 @@ export default function App() {
         <Link to="/app/banners/new">Create Banner</Link>
         <Link to="/app/pricing">Pricing</Link>
         <Link to="/app/settings">Settings</Link>
+        <Link to="/app/privacy">Privacy</Link>
       </NavMenu>
 
       <div className="sf-content-area">
