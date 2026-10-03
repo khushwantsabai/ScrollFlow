@@ -119,3 +119,50 @@ export async function requestSubscription(request, planName) {
 
   return { confirmationUrl: null, success: true, plan: planName };
 }
+
+export async function verifyAndSyncSubscription(request, chargeId) {
+  const { admin, session } = await authenticate.admin(request);
+  const shopDomain = session.shop;
+
+  const response = await admin.graphql(
+    `#graphql
+    query GetSubscription($id: ID!) {
+      node(id: $id) {
+        ... on AppSubscription {
+          id
+          name
+          status
+        }
+      }
+    }`,
+    {
+      variables: {
+        id: `gid://shopify/AppSubscription/${chargeId}`
+      }
+    }
+  );
+
+  const responseJson = await response.json();
+  const subscription = responseJson.data?.node;
+
+  if (subscription && subscription.status === "ACTIVE") {
+    let planName = "BASIC";
+    if (subscription.name.includes("Premium")) planName = "PREMIUM";
+    else if (subscription.name.includes("Basic")) planName = "BASIC";
+    else if (subscription.name.includes("Free")) planName = "FREE";
+
+    await prisma.shop.upsert({
+      where: { shopDomain },
+      update: { plan: planName },
+      create: { shopDomain, accessToken: session.accessToken, plan: planName },
+    });
+
+    await prisma.subscription.create({
+      data: {
+        shopDomain,
+        plan: planName,
+        status: "ACTIVE",
+      },
+    });
+  }
+}
