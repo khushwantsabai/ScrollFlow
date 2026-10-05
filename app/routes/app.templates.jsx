@@ -1,5 +1,5 @@
 // app/routes/app.templates.jsx
-import { useLoaderData, useNavigate, Link, redirect } from "react-router";
+import { useLoaderData, useNavigate, Link } from "react-router";
 import { useState } from "react";
 import { authenticate } from "../shopify.server";
 import { getShopData, DEFAULT_TEMPLATES } from "../utils/db.helpers.server";
@@ -7,7 +7,7 @@ import { canAccessTemplate } from "../utils/permissions";
 import { verifyAndSyncSubscription } from "../utils/billing.server";
 
 export const loader = async ({ request }) => {
-  const { session } = await authenticate.admin(request);
+  const { session, redirect } = await authenticate.admin(request);
   
   const url = new URL(request.url);
   const chargeId = url.searchParams.get("charge_id");
