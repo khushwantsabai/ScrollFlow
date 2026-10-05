@@ -36,12 +36,17 @@ type = "multi_line_text_field"
 [webhooks]
 api_version = "2026-10"
 
+  [webhooks.privacy_compliance]
+  customer_deletion_url = "https://scroll-flow-pied.vercel.app/webhooks"
+  customer_data_request_url = "https://scroll-flow-pied.vercel.app/webhooks"
+  shop_deletion_url = "https://scroll-flow-pied.vercel.app/webhooks"
+
   [[webhooks.subscriptions]]
-  uri = "/webhooks/app/uninstalled"
+  uri = "/webhooks"
   topics = [ "app/uninstalled" ]
 
   [[webhooks.subscriptions]]
-  uri = "/webhooks/app/scopes_update"
+  uri = "/webhooks"
   topics = [ "app/scopes_update" ]
 
 [auth]
