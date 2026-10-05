@@ -145,7 +145,7 @@ export default function PricingPage() {
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <span style={{ fontSize: "36px", fontWeight: "800", color: "#111827" }}>$9</span>
+              <span style={{ fontSize: "36px", fontWeight: "800", color: "#111827" }}>$19</span>
               <span style={{ fontSize: "14px", color: "#64748B" }}> /month</span>
             </div>
 
@@ -190,7 +190,7 @@ export default function PricingPage() {
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <span style={{ fontSize: "36px", fontWeight: "800", color: "#111827" }}>$19</span>
+              <span style={{ fontSize: "36px", fontWeight: "800", color: "#111827" }}>$24</span>
               <span style={{ fontSize: "14px", color: "#64748B" }}> /month</span>
             </div>
 

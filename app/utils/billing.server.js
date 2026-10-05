@@ -10,12 +10,12 @@ export const BILLING_PLANS = {
   },
   BASIC: {
     name: "Basic",
-    price: 9.0,
+    price: 19.0,
     interval: "EVERY_30_DAYS",
   },
   PREMIUM: {
     name: "Premium",
-    price: 19.0,
+    price: 24.0,
     interval: "EVERY_30_DAYS",
   },
 };
