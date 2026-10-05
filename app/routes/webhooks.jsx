@@ -30,8 +30,9 @@ export const action = async ({ request }) => {
       break;
 
     default:
-      throw new Response("Unhandled webhook topic", { status: 404 });
+      console.log(`Unhandled webhook topic: ${topic}`);
+      break;
   }
 
-  throw new Response();
+  return new Response("", { status: 200 });
 };
