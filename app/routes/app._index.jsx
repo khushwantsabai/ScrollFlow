@@ -122,9 +122,13 @@ export const action = async ({ request }) => {
 };
 
 export default function Dashboard() {
-  const { plan, banners, stats } = useLoaderData();
+  const { plan, banners, stats, shopDomain } = useLoaderData();
   const fetcher = useFetcher();
   const [deleteTargetId, setDeleteTargetId] = useState(null);
+
+  const storeName = shopDomain
+    ? shopDomain.replace('.myshopify.com', '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    : "Store Owner";
 
   // Compute optimistic banner statuses during in-flight submissions
   const activeSubmissionId =
@@ -185,7 +189,7 @@ export default function Dashboard() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px" }}>
         <div>
           <h1 style={{ fontSize: "24px", fontWeight: "700", color: "#111827", margin: "0 0 6px 0" }}>
-            Welcome back, Khushwant!
+            Welcome back, {storeName}!
           </h1>
           <p style={{ fontSize: "14px", color: "#64748B", margin: 0 }}>
             Create and publish scrolling banners for your Shopify store.
