@@ -13,7 +13,7 @@ export const loader = async ({ request }) => {
   const chargeId = url.searchParams.get("charge_id");
   if (chargeId) {
     await verifyAndSyncSubscription(request, chargeId);
-    return redirect("/app/templates");
+    // Removed redirect here to avoid breaking App Bridge iframe context on load
   }
 
   const shopData = await getShopData(session.shop);
