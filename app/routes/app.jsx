@@ -46,9 +46,33 @@ export default function App() {
   );
 }
 
-// Shopify needs to catch "bounce to embedded" 200 responses that are thrown by authenticate.admin
 export function ErrorBoundary() {
-  return boundary.error(useRouteError());
+  const error = useRouteError();
+  
+  // React Router v7 changed the internal ErrorResponse constructor name, 
+  // causing Shopify's boundary.error to fail and render "200" on the screen.
+  // We manually handle the bounce response here.
+  if (error && error.status === 200) {
+    return (
+      <div 
+        dangerouslySetInnerHTML={{ __html: error.data || "Redirecting to Shopify Admin..." }} 
+        suppressHydrationWarning={true}
+      />
+    );
+  }
+
+  // For other errors, try the default Shopify boundary, but don't let it crash the app
+  try {
+    return boundary.error(error);
+  } catch (e) {
+    console.error("Shopify boundary failed:", e);
+    return (
+      <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
+        <h2>App Error</h2>
+        <p>{error?.message || "An unexpected error occurred."}</p>
+      </div>
+    );
+  }
 }
 
 export const headers = (headersArgs) => {

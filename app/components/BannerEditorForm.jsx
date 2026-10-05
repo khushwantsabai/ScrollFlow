@@ -424,8 +424,21 @@ export default function BannerEditorForm({ initialData, isNew = false, shopPlan 
                         <label style={{ fontSize: "12px", color: "#64748B", display: "block", marginBottom: "4px" }}>Font Size ({settings.fontSize}px)</label>
                         <input
                           type="number"
+                          min="8"
+                          max="120"
                           value={settings.fontSize}
-                          onChange={(e) => setSettings({ ...settings, fontSize: Number(e.target.value) })}
+                          onChange={(e) => {
+                            // Only clamp max during typing to allow deleting/typing 1-digit numbers
+                            let val = Number(e.target.value);
+                            if (val > 120) val = 120;
+                            setSettings({ ...settings, fontSize: val });
+                          }}
+                          onBlur={(e) => {
+                            let val = Number(e.target.value);
+                            if (val < 8) val = 8;
+                            if (val > 120) val = 120;
+                            setSettings({ ...settings, fontSize: val });
+                          }}
                           style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "12px" }}
                         />
                       </div>
