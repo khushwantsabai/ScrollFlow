@@ -1,4 +1,5 @@
 // app/routes/app.jsx
+import { useEffect, useRef } from "react";
 import { Outlet, useLoaderData, Link, useRouteError } from "react-router";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
@@ -48,13 +49,28 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  const bounceRef = useRef(null);
   
+  useEffect(() => {
+    if (error && error.status === 200 && bounceRef.current) {
+      const scriptElement = bounceRef.current.querySelector("script");
+      if (scriptElement && scriptElement.text) {
+        // dangerouslySetInnerHTML does not execute scripts for security reasons.
+        // We must manually create a script tag to force the App Bridge redirect.
+        const newScript = document.createElement("script");
+        newScript.text = scriptElement.text;
+        document.head.appendChild(newScript);
+      }
+    }
+  }, [error]);
+
   // React Router v7 changed the internal ErrorResponse constructor name, 
   // causing Shopify's boundary.error to fail and render "200" on the screen.
   // We manually handle the bounce response here.
   if (error && error.status === 200) {
     return (
       <div 
+        ref={bounceRef}
         dangerouslySetInnerHTML={{ __html: error.data || "Redirecting to Shopify Admin..." }} 
         suppressHydrationWarning={true}
       />
