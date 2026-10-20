@@ -52,10 +52,10 @@ model Subscription {
   id                    String   @id @default(uuid())
   status                String   @default("ACTIVE")
   createdAt             DateTime @default(now())
-  plan                  String
-  shopDomain            String
+  plan                  String   @default("BASIC")
+  shopDomain            String   @default("")
   shopifySubscriptionId String?
-  updatedAt             DateTime @updatedAt
+  updatedAt             DateTime @default(now()) @updatedAt
 }
 
 model Template {
@@ -63,10 +63,10 @@ model Template {
   name         String
   createdAt    DateTime @default(now())
   description  String?
-  plan         String
+  plan         String   @default("FREE")
   previewImage String?
-  settings     String
-  updatedAt    DateTime @updatedAt
+  settings     String   @default("{}")
+  updatedAt    DateTime @default(now()) @updatedAt
 }
 
 model StoreSettings {
