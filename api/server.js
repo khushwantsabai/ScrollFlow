@@ -1,10 +1,10 @@
 import pkg from "@react-router/node";
 import { stat, readFile } from "node:fs/promises";
 import { join, extname } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const { createRequestHandler } = pkg;
 
-// Inline mime map — no external dependency
 const MIME = {
   ".js":    "text/javascript; charset=utf-8",
   ".css":   "text/css; charset=utf-8",
@@ -22,14 +22,17 @@ const MIME = {
   ".ttf":   "font/ttf",
 };
 
-// Dynamic import — NOT resolved at Vercel CLI validation time (pre-build),
-// so the "functions" key validation passes even though build/server doesn't
-// exist yet. The includeFiles config in vercel.json copies build/** into
-// the function bundle at deploy time so it's available here at runtime.
+// Use process.cwd() (= /var/task in Vercel Lambda) to build an absolute path.
+// Relative paths like "../build/server/index.js" shift after Vercel bundles the
+// function file, but process.cwd() always points to the Lambda task root where
+// includeFiles places the build/** files.
 let _handler;
 async function getHandler() {
   if (!_handler) {
-    const build = await import("../build/server/index.js");
+    const buildPath = pathToFileURL(
+      join(process.cwd(), "build", "server", "index.js")
+    ).href;
+    const build = await import(buildPath);
     _handler = createRequestHandler({ build });
   }
   return _handler;
@@ -38,8 +41,7 @@ async function getHandler() {
 const CLIENT_DIR = join(process.cwd(), "build", "client");
 
 export default async function handler(req, res) {
-  // Serve static assets (JS/CSS/fonts) directly from build/client
-  // These are copied into the function bundle via includeFiles:build/**
+  // Serve hashed static assets directly (JS/CSS/fonts/images)
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = decodeURIComponent(url.pathname);
@@ -57,9 +59,15 @@ export default async function handler(req, res) {
       }
     }
   } catch {
-    // Not a static asset — fall through to React Router
+    // Not a static asset — pass to React Router
   }
 
-  const h = await getHandler();
-  return h(req, res);
+  try {
+    const h = await getHandler();
+    return h(req, res);
+  } catch (err) {
+    console.error("[ScrollFlow] Handler error:", err);
+    res.statusCode = 500;
+    res.end(`Server Error: ${err.message}`);
+  }
 }
