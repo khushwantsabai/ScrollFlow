@@ -1,7 +1,11 @@
 {
   "framework": null,
   "buildCommand": "npm run build",
-  "outputDirectory": "build/client",
+  "functions": {
+    "api/server.js": {
+      "includeFiles": "build/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
