@@ -1,5 +1,10 @@
-// api/server.js — Vercel serverless handler for React Router v7 (ESM)
-// Uses dynamic import() for @react-router/node (pure ESM package — require() won't work).
+// api/server.js — Vercel serverless handler for React Router v7
+//
+// @react-router/node exports `createRequestListener` (NOT createRequestHandler).
+// createRequestListener wraps the React Router build into a Node.js-compatible
+// (req: IncomingMessage, res: ServerResponse) => void handler — exactly what
+// Vercel Lambda provides.
+import { createRequestListener } from "@react-router/node";
 import { join, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 import { stat, readFile } from "node:fs/promises";
@@ -21,30 +26,20 @@ const MIME = {
   ".ttf":   "font/ttf",
 };
 
-let _handler;
-async function getHandler() {
-  if (!_handler) {
-    // ESM dynamic import — works correctly with pure-ESM packages like @react-router/node
-    const { createRequestHandler } = await import("@react-router/node");
-
-    if (typeof createRequestHandler !== "function") {
-      const mod = await import("@react-router/node");
-      const keys = Object.keys(mod).join(", ");
-      throw new Error(
-        `createRequestHandler is not a function. Available exports: ${keys}`
-      );
-    }
-
-    // Dynamic import of the React Router server bundle via absolute file URL
-    // so Vercel's bundler doesn't re-bundle the Vite-generated output
+let _listener;
+async function getListener() {
+  if (!_listener) {
+    // Dynamic import of the Vite-generated React Router server bundle via
+    // absolute file URL so Vercel's bundler doesn't re-bundle it.
     const buildPath = pathToFileURL(
       join(process.cwd(), "build", "server", "index.js")
     ).href;
     const build = await import(buildPath);
 
-    _handler = createRequestHandler({ build });
+    // createRequestListener(build) → Node.js (req, res) handler
+    _listener = createRequestListener({ build });
   }
-  return _handler;
+  return _listener;
 }
 
 const CLIENT_DIR = join(process.cwd(), "build", "client");
@@ -68,12 +63,12 @@ export default async function handler(req, res) {
       }
     }
   } catch {
-    // Not a static asset — fall through to React Router handler
+    // Not a static asset — fall through to React Router listener
   }
 
   try {
-    const h = await getHandler();
-    return h(req, res);
+    const listener = await getListener();
+    return listener(req, res);
   } catch (err) {
     console.error("[ScrollFlow] Handler error:", err);
     res.statusCode = 500;
