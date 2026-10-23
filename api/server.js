@@ -1,9 +1,8 @@
-import pkg from "@react-router/node";
-import { stat, readFile } from "node:fs/promises";
+// api/server.js — Vercel serverless handler for React Router v7 (ESM)
+// Uses dynamic import() for @react-router/node (pure ESM package — require() won't work).
 import { join, extname } from "node:path";
 import { pathToFileURL } from "node:url";
-
-const { createRequestHandler } = pkg;
+import { stat, readFile } from "node:fs/promises";
 
 const MIME = {
   ".js":    "text/javascript; charset=utf-8",
@@ -22,17 +21,27 @@ const MIME = {
   ".ttf":   "font/ttf",
 };
 
-// Use process.cwd() (= /var/task in Vercel Lambda) to build an absolute path.
-// Relative paths like "../build/server/index.js" shift after Vercel bundles the
-// function file, but process.cwd() always points to the Lambda task root where
-// includeFiles places the build/** files.
 let _handler;
 async function getHandler() {
   if (!_handler) {
+    // ESM dynamic import — works correctly with pure-ESM packages like @react-router/node
+    const { createRequestHandler } = await import("@react-router/node");
+
+    if (typeof createRequestHandler !== "function") {
+      const mod = await import("@react-router/node");
+      const keys = Object.keys(mod).join(", ");
+      throw new Error(
+        `createRequestHandler is not a function. Available exports: ${keys}`
+      );
+    }
+
+    // Dynamic import of the React Router server bundle via absolute file URL
+    // so Vercel's bundler doesn't re-bundle the Vite-generated output
     const buildPath = pathToFileURL(
       join(process.cwd(), "build", "server", "index.js")
     ).href;
     const build = await import(buildPath);
+
     _handler = createRequestHandler({ build });
   }
   return _handler;
@@ -41,7 +50,7 @@ async function getHandler() {
 const CLIENT_DIR = join(process.cwd(), "build", "client");
 
 export default async function handler(req, res) {
-  // Serve hashed static assets directly (JS/CSS/fonts/images)
+  // Serve hashed static assets directly from build/client
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = decodeURIComponent(url.pathname);
@@ -59,7 +68,7 @@ export default async function handler(req, res) {
       }
     }
   } catch {
-    // Not a static asset — pass to React Router
+    // Not a static asset — fall through to React Router handler
   }
 
   try {
@@ -68,6 +77,6 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error("[ScrollFlow] Handler error:", err);
     res.statusCode = 500;
-    res.end(`Server Error: ${err.message}`);
+    res.end(`Server Error: ${err.message}\n\nStack: ${err.stack}`);
   }
 }
