@@ -106,7 +106,7 @@ export default function PricingPage() {
           </button>
         </div>
 
-        {/* BASIC CARD (MOST POPULAR) */}
+        {/* BASIC CARD */}
         <div
           className="sf-card"
           style={{
@@ -116,27 +116,8 @@ export default function PricingPage() {
             justifyContent: "space-between",
             border: "2px solid #5B2CFF",
             boxShadow: "0 8px 24px rgba(91, 44, 255, 0.12)",
-            position: "relative",
           }}
         >
-          {/* Most Popular Badge */}
-          <div
-            style={{
-              position: "absolute",
-              top: "-14px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              backgroundColor: "#5B2CFF",
-              color: "#FFFFFF",
-              fontSize: "11px",
-              fontWeight: "700",
-              padding: "4px 14px",
-              borderRadius: "9999px",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Most Popular
-          </div>
 
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
